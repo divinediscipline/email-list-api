@@ -1,0 +1,171 @@
+### Email Client API Tests
+
+# Base URL
+@baseUrl = http://localhost:3000
+
+### 1. Health Check
+GET {{baseUrl}}/health
+
+### 2. API Documentation
+GET {{baseUrl}}/api
+
+### 3. Register a new user
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123",
+  "name": "Test User",
+  "role": "developer"
+}
+
+### 4. Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "ari.budin@example.com",
+  "password": "password"
+}
+
+### 5. Get user profile (requires token)
+GET {{baseUrl}}/api/auth/profile
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 6. Get emails with pagination
+GET {{baseUrl}}/api/emails?page=1&limit=15
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 7. Get emails filtered by folder
+GET {{baseUrl}}/api/emails?folder=inbox&isRead=false
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 8. Get emails with search
+GET {{baseUrl}}/api/emails?search=important
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 9. Get email counts by folder
+GET {{baseUrl}}/api/emails/counts
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 10. Get specific email
+GET {{baseUrl}}/api/emails/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 11. Mark email as read
+PATCH {{baseUrl}}/api/emails/1/read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 12. Toggle email star
+PATCH {{baseUrl}}/api/emails/1/star
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 13. Toggle email important
+PATCH {{baseUrl}}/api/emails/1/important
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 14. Move email to folder
+PATCH {{baseUrl}}/api/emails/1/move
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "folder": "starred"
+}
+
+### 15. Get email labels
+GET {{baseUrl}}/api/emails/labels
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 16. Create email label
+POST {{baseUrl}}/api/emails/labels
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "Personal",
+  "color": "#FF6B6B"
+}
+
+### 17. Add label to email
+PATCH {{baseUrl}}/api/emails/1/labels/add
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "label": "Work"
+}
+
+### 18. Remove label from email
+PATCH {{baseUrl}}/api/emails/1/labels/remove
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "label": "Work"
+}
+
+### 19. Get navigation items
+GET {{baseUrl}}/api/navigation/items
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 20. Get upgrade info
+GET {{baseUrl}}/api/navigation/upgrade-info
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 21. Get notifications
+GET {{baseUrl}}/api/notifications/notifications
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 22. Get unread notification count
+GET {{baseUrl}}/api/notifications/notifications/unread-count
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 23. Mark notification as read
+PATCH {{baseUrl}}/api/notifications/notifications/1/read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 24. Mark all notifications as read
+PATCH {{baseUrl}}/api/notifications/notifications/mark-all-read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 25. Get messages
+GET {{baseUrl}}/api/notifications/messages
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 26. Get unread message count
+GET {{baseUrl}}/api/notifications/messages/unread-count
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 27. Mark message as read
+PATCH {{baseUrl}}/api/notifications/messages/1/read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 28. Mark all messages as read
+PATCH {{baseUrl}}/api/notifications/messages/mark-all-read
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 29. Update user profile
+PUT {{baseUrl}}/api/auth/profile
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "name": "Updated Name",
+  "role": "senior developer"
+}
+
+### 30. Change password
+PUT {{baseUrl}}/api/auth/change-password
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "currentPassword": "password",
+  "newPassword": "newpassword123"
+}
+
+### 31. Logout
+POST {{baseUrl}}/api/auth/logout
+Authorization: Bearer YOUR_JWT_TOKEN_HERE 

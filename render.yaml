@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: email-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true
+      - key: DATA_RETENTION_HOURS
+        value: 48
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: ALLOWED_ORIGINS
+        value: https://yourdomain.com
+    healthCheckPath: /health
+
+databases:
+  - name: email-api-db
+    databaseName: email_api
+    user: email_api_user
+    plan: free 
