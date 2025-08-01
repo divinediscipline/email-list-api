@@ -18,6 +18,26 @@ services:
         value: 900000
       - key: ALLOWED_ORIGINS
         value: https://yourdomain.com
+      - key: DB_HOST
+        fromDatabase:
+          name: email-api-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: email-api-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: email-api-db
+          property: database
+      - key: DB_USER
+        fromDatabase:
+          name: email-api-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: email-api-db
+          property: password
     healthCheckPath: /health
 
 databases:
