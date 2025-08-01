@@ -68,21 +68,20 @@ DB_PASSWORD=your_db_password
 
 1. **Deploy**: Click "Create Web Service" to start the deployment
 2. **Wait for Build**: Monitor the build logs for any issues
-3. **Initialize Database**: Once deployed, run these commands in Render's shell:
+3. **Database Initialization**: The application will automatically:
+   - Run database migrations on startup
+   - Seed the database with sample data (realistic user and 20 records each for emails, notifications, and messages)
 
-```bash
-# Run database migrations
-npm run db:migrate
-
-# Seed with sample data (optional)
-npm run db:seed
-```
+**Note**: Database seeding is now automatic and will occur on every application startup. The seeding process is idempotent, meaning it won't create duplicate data if run multiple times.
 
 ## Step 6: Verify Deployment
 
 1. **Health Check**: Visit `https://your-app.onrender.com/health`
 2. **API Documentation**: Visit `https://your-app.onrender.com/api`
 3. **Test Endpoints**: Use the test-api.http file or Postman
+4. **Login with Test User**: 
+   - Email: `sarah.johnson@techcorp.com`
+   - Password: `SecurePass123!`
 
 ## Environment Variables Reference
 
@@ -139,6 +138,9 @@ npm run db:migrate
 
 # Manual data cleanup
 npm run db:cleanup
+
+# Manual database seeding (if needed)
+npm run db:seed
 ```
 
 ## Monitoring and Maintenance

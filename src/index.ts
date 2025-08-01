@@ -17,6 +17,7 @@ import notificationRoutes from './routes/notificationRoutes';
 // Import database services
 import databaseService from './services/databaseService';
 import cleanupOldData from './database/cleanup';
+import seedDatabase from './database/seed';
 
 // Load environment variables
 dotenv.config();
@@ -220,13 +221,22 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Start server
-const server = app.listen(PORT, () => {
+const server = app.listen(PORT, async () => {
   console.log(`🚀 Email API server running on port ${PORT}`);
   console.log(`📚 API documentation available at http://localhost:${PORT}/api`);
   console.log(`💚 Health check available at http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🗄️  Database: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`);
   console.log(`⏰ Data retention: ${process.env.DATA_RETENTION_HOURS || '48'} hours`);
+  
+  // Seed database on startup
+  try {
+    console.log('🌱 Seeding database with initial data...');
+    await seedDatabase();
+    console.log('✅ Database seeding completed');
+  } catch (error) {
+    console.log('⚠️  Database seeding failed (this is normal if data already exists):', error);
+  }
   
   // Schedule cleanup after server starts
   scheduleCleanup();
