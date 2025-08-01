@@ -115,47 +115,51 @@ Content-Type: application/json
   "label": "Work"
 }
 
-### 20. Get navigation items
+### 20. Delete email label
+DELETE {{baseUrl}}/api/emails/labels/1
+Authorization: Bearer YOUR_JWT_TOKEN_HERE
+
+### 21. Get navigation items
 GET {{baseUrl}}/api/navigation/items
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 21. Get upgrade info
+### 22. Get upgrade info
 GET {{baseUrl}}/api/navigation/upgrade-info
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 22. Get notifications
+### 23. Get notifications
 GET {{baseUrl}}/api/notifications/notifications
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 23. Get unread notification count
+### 24. Get unread notification count
 GET {{baseUrl}}/api/notifications/notifications/unread-count
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 24. Mark notification as read
+### 25. Mark notification as read
 PATCH {{baseUrl}}/api/notifications/notifications/1/read
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 25. Mark all notifications as read
+### 26. Mark all notifications as read
 PATCH {{baseUrl}}/api/notifications/notifications/mark-all-read
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 26. Get messages
+### 27. Get messages
 GET {{baseUrl}}/api/notifications/messages
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 27. Get unread message count
+### 28. Get unread message count
 GET {{baseUrl}}/api/notifications/messages/unread-count
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 28. Mark message as read
+### 29. Mark message as read
 PATCH {{baseUrl}}/api/notifications/messages/1/read
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 29. Mark all messages as read
+### 30. Mark all messages as read
 PATCH {{baseUrl}}/api/notifications/messages/mark-all-read
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 
-### 30. Update user profile
+### 31. Update user profile
 PUT {{baseUrl}}/api/auth/profile
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 Content-Type: application/json
@@ -165,7 +169,7 @@ Content-Type: application/json
   "role": "senior developer"
 }
 
-### 31. Change password
+### 32. Change password
 PUT {{baseUrl}}/api/auth/change-password
 Authorization: Bearer YOUR_JWT_TOKEN_HERE
 Content-Type: application/json
@@ -175,6 +179,6 @@ Content-Type: application/json
   "newPassword": "NewSecurePass456!"
 }
 
-### 32. Logout
+### 33. Logout
 POST {{baseUrl}}/api/auth/logout
 Authorization: Bearer YOUR_JWT_TOKEN_HERE 
