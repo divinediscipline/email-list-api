@@ -70,9 +70,10 @@ DB_PASSWORD=your_db_password
 2. **Wait for Build**: Monitor the build logs for any issues
 3. **Database Initialization**: The application will automatically:
    - Run database migrations on startup
-   - Seed the database with sample data (realistic user and 20 records each for emails, notifications, and messages)
+   - Clear all existing data from the database
+   - Seed the database with fresh sample data (realistic user and 20 records each for emails, notifications, and messages)
 
-**Note**: Database seeding is now automatic and will occur on every application startup. The seeding process is idempotent, meaning it won't create duplicate data if run multiple times.
+**Note**: Database seeding is now automatic and will occur on every application startup. The seeding process clears all existing data and creates fresh sample data, ensuring a clean slate for each deployment.
 
 ## Step 6: Verify Deployment
 

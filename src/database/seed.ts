@@ -8,6 +8,17 @@ const seedDatabase = async () => {
   try {
     console.log('🌱 Seeding database with initial data...');
     
+    // Clear all existing data (in reverse dependency order)
+    console.log('🧹 Clearing existing data...');
+    await client.query('DELETE FROM email_label_mappings');
+    await client.query('DELETE FROM attachments');
+    await client.query('DELETE FROM emails');
+    await client.query('DELETE FROM email_labels');
+    await client.query('DELETE FROM notifications');
+    await client.query('DELETE FROM messages');
+    await client.query('DELETE FROM users');
+    console.log('✅ Existing data cleared');
+    
     // Create a realistic user
     const hashedPassword = await bcrypt.hash('SecurePass123!', 10);
     const userId = uuidv4();
@@ -15,8 +26,8 @@ const seedDatabase = async () => {
     await client.query(`
       INSERT INTO users (id, email, password, name, role)
       VALUES ($1, $2, $3, $4, $5)
-      ON CONFLICT (email) DO NOTHING
     `, [userId, 'sarah.johnson@techcorp.com', hashedPassword, 'Sarah Johnson', 'user']);
+    console.log('✅ Created user: sarah.johnson@techcorp.com');
     
     // Create email labels
     const labels = [
@@ -32,9 +43,9 @@ const seedDatabase = async () => {
       await client.query(`
         INSERT INTO email_labels (id, user_id, name, color)
         VALUES ($1, $2, $3, $4)
-        ON CONFLICT DO NOTHING
       `, [label.id, userId, label.name, label.color]);
     }
+    console.log('✅ Created email labels');
     
     // Create 20 realistic sample emails
     const sampleEmails = [
@@ -317,6 +328,7 @@ const seedDatabase = async () => {
         `, [emailId, randomName, randomSize, randomType, `/uploads/${randomName}`]);
       }
     }
+    console.log('✅ Created 20 sample emails with labels and attachments');
     
     // Create 20 sample notifications
     const notifications = [
@@ -348,6 +360,7 @@ const seedDatabase = async () => {
         VALUES ($1, $2, $3, $4)
       `, [userId, notification.title, notification.message, notification.type]);
     }
+    console.log('✅ Created 20 sample notifications');
     
     // Create 20 sample messages
     const messages = [
@@ -379,8 +392,15 @@ const seedDatabase = async () => {
         VALUES ($1, $2, $3, $4)
       `, [userId, message.title, message.content, message.type]);
     }
+    console.log('✅ Created 20 sample messages');
     
     console.log('✅ Database seeded successfully');
+    console.log('📊 Summary:');
+    console.log('   - 1 user created');
+    console.log('   - 6 email labels created');
+    console.log('   - 20 emails with labels and attachments');
+    console.log('   - 20 notifications');
+    console.log('   - 20 messages');
     console.log('📧 Test user: sarah.johnson@techcorp.com / SecurePass123!');
     
   } catch (error) {
