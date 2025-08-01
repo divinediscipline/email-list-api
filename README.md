@@ -39,7 +39,7 @@ A production-ready REST API for email client applications with PostgreSQL databa
 2. **Deploy to Render**
    - Connect your GitHub repository to Render
    - Create a new Web Service
-   - Set build command: `npm install`
+   - Set build command: `npm install && npm run build`
    - Set start command: `npm start`
    - Add environment variables (see Environment Variables section)
 

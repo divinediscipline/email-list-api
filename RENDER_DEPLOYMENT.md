@@ -25,7 +25,7 @@ This guide will help you deploy the Email API to Render without Docker.
 - **Root Directory**: Leave empty (if code is in root)
 
 ### Build & Deploy Settings
-- **Build Command**: `npm install`
+- **Build Command**: `npm install && npm run build`
 - **Start Command**: `npm start`
 - **Plan**: Free (for testing) or Paid (for production)
 
