@@ -110,8 +110,6 @@ A production-ready REST API for email client applications with PostgreSQL databa
 | `DB_PASSWORD` | `password` | Database password |
 | `JWT_SECRET` | `fallback-secret` | JWT signing secret |
 | `DATA_RETENTION_HOURS` | `48` | Data retention period |
-| `RATE_LIMIT_MAX_REQUESTS` | `100` | Rate limit requests per window |
-| `RATE_LIMIT_WINDOW_MS` | `900000` | Rate limit window (15 minutes) |
 | `ALLOWED_ORIGINS` | `https://yourdomain.com` | CORS allowed origins |
 
 ## Render Deployment

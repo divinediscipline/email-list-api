@@ -38,8 +38,6 @@ In your Render dashboard, add these environment variables:
 NODE_ENV=production
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 DATA_RETENTION_HOURS=48
-RATE_LIMIT_MAX_REQUESTS=100
-RATE_LIMIT_WINDOW_MS=900000
 ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
