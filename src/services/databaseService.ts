@@ -5,6 +5,27 @@ export class DatabaseService {
   // Expose pool for external access
   public pool = pool;
 
+  // Transform database result (snake_case) to application format (camelCase)
+  private transformEmailFromDatabase(dbEmail: any): Email {
+    return {
+      id: dbEmail.id,
+      userId: dbEmail.user_id,
+      from: dbEmail.from,
+      to: dbEmail.to,
+      subject: dbEmail.subject,
+      body: dbEmail.body,
+      isRead: dbEmail.is_read,
+      isStarred: dbEmail.is_starred,
+      isImportant: dbEmail.is_important,
+      hasAttachments: dbEmail.has_attachments,
+      attachments: [], // Will be populated separately
+      labels: dbEmail.labels || [],
+      timestamp: dbEmail.timestamp,
+      createdAt: dbEmail.created_at,
+      updatedAt: dbEmail.updated_at
+    };
+  }
+
   // User operations
   async createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
     const client = await pool.connect();
@@ -83,7 +104,8 @@ export class DatabaseService {
         emailData.timestamp
       ]);
       
-      return result.rows[0];
+      // Transform the created email from snake_case to camelCase
+      return this.transformEmailFromDatabase(result.rows[0]);
     } finally {
       client.release();
     }
@@ -186,8 +208,11 @@ export class DatabaseService {
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `, [...params, pagination.limit, offset]);
 
+      // Transform emails from snake_case to camelCase
+      const emails = result.rows.map(row => this.transformEmailFromDatabase(row));
+      
       return {
-        emails: result.rows,
+        emails,
         total
       };
     } finally {
@@ -207,7 +232,12 @@ export class DatabaseService {
         WHERE e.id = $1
         GROUP BY e.id
       `, [id]);
-      return result.rows[0] || null;
+      
+      if (!result.rows[0]) return null;
+      
+      // Transform snake_case to camelCase
+      const email = this.transformEmailFromDatabase(result.rows[0]);
+      return email;
     } finally {
       client.release();
     }
@@ -242,7 +272,10 @@ export class DatabaseService {
         UPDATE emails SET ${fields} WHERE id = $1 RETURNING *
       `, [id, ...values]);
       
-      return result.rows[0] || null;
+      if (!result.rows[0]) return null;
+      
+      // Transform the updated email from snake_case to camelCase
+      return this.transformEmailFromDatabase(result.rows[0]);
     } finally {
       client.release();
     }
