@@ -44,8 +44,20 @@ export class DatabaseService {
   async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
     const client = await pool.connect();
     try {
-      const fields = Object.keys(updates).map((key, index) => `${key} = $${index + 2}`).join(', ');
-      const values = Object.values(updates);
+      // Map camelCase property names to snake_case column names
+      const columnMapping: Record<string, string> = {
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+      };
+
+      const mappedUpdates: Record<string, any> = {};
+      Object.keys(updates).forEach(key => {
+        const columnName = columnMapping[key] || key;
+        mappedUpdates[columnName] = updates[key as keyof User];
+      });
+
+      const fields = Object.keys(mappedUpdates).map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+      const values = Object.values(mappedUpdates);
       
       const result = await client.query(`
         UPDATE users SET ${fields} WHERE id = $1 RETURNING *
@@ -157,8 +169,25 @@ export class DatabaseService {
   async updateEmail(id: string, updates: Partial<Email>): Promise<Email | null> {
     const client = await pool.connect();
     try {
-      const fields = Object.keys(updates).map((key, index) => `${key} = $${index + 2}`).join(', ');
-      const values = Object.values(updates);
+      // Map camelCase property names to snake_case column names
+      const columnMapping: Record<string, string> = {
+        isRead: 'is_read',
+        isStarred: 'is_starred',
+        isImportant: 'is_important',
+        hasAttachments: 'has_attachments',
+        userId: 'user_id',
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+      };
+
+      const mappedUpdates: Record<string, any> = {};
+      Object.keys(updates).forEach(key => {
+        const columnName = columnMapping[key] || key;
+        mappedUpdates[columnName] = updates[key as keyof Email];
+      });
+
+      const fields = Object.keys(mappedUpdates).map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+      const values = Object.values(mappedUpdates);
       
       const result = await client.query(`
         UPDATE emails SET ${fields} WHERE id = $1 RETURNING *
@@ -281,8 +310,22 @@ export class DatabaseService {
   async updateNotification(id: string, updates: Partial<Notification>): Promise<Notification | null> {
     const client = await pool.connect();
     try {
-      const fields = Object.keys(updates).map((key, index) => `${key} = $${index + 2}`).join(', ');
-      const values = Object.values(updates);
+      // Map camelCase property names to snake_case column names
+      const columnMapping: Record<string, string> = {
+        userId: 'user_id',
+        isRead: 'is_read',
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+      };
+
+      const mappedUpdates: Record<string, any> = {};
+      Object.keys(updates).forEach(key => {
+        const columnName = columnMapping[key] || key;
+        mappedUpdates[columnName] = updates[key as keyof Notification];
+      });
+
+      const fields = Object.keys(mappedUpdates).map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+      const values = Object.values(mappedUpdates);
       
       const result = await client.query(`
         UPDATE notifications SET ${fields} WHERE id = $1 RETURNING *
@@ -340,8 +383,22 @@ export class DatabaseService {
   async updateMessage(id: string, updates: Partial<Message>): Promise<Message | null> {
     const client = await pool.connect();
     try {
-      const fields = Object.keys(updates).map((key, index) => `${key} = $${index + 2}`).join(', ');
-      const values = Object.values(updates);
+      // Map camelCase property names to snake_case column names
+      const columnMapping: Record<string, string> = {
+        userId: 'user_id',
+        isRead: 'is_read',
+        createdAt: 'created_at',
+        updatedAt: 'updated_at'
+      };
+
+      const mappedUpdates: Record<string, any> = {};
+      Object.keys(updates).forEach(key => {
+        const columnName = columnMapping[key] || key;
+        mappedUpdates[columnName] = updates[key as keyof Message];
+      });
+
+      const fields = Object.keys(mappedUpdates).map((key, index) => `"${key}" = $${index + 2}`).join(', ');
+      const values = Object.values(mappedUpdates);
       
       const result = await client.query(`
         UPDATE messages SET ${fields} WHERE id = $1 RETURNING *
