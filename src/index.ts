@@ -17,7 +17,6 @@ import notificationRoutes from './routes/notificationRoutes';
 // Import database services
 import databaseService from './services/databaseService';
 import cleanupOldData from './database/cleanup';
-import seedDatabase from './database/seed';
 
 // Load environment variables
 dotenv.config();
@@ -125,13 +124,12 @@ app.get('/api', (req, res) => {
       },
       emails: {
         'GET /api/emails': 'Get emails with filtering and pagination',
-        'GET /api/emails/counts': 'Get email counts by folder',
+        'GET /api/emails/counts': 'Get email counts by view',
         'GET /api/emails/:id': 'Get specific email',
         'DELETE /api/emails/:id': 'Delete email',
         'PATCH /api/emails/:id/read': 'Mark email as read',
         'PATCH /api/emails/:id/star': 'Toggle email star',
         'PATCH /api/emails/:id/important': 'Toggle email important',
-        'PATCH /api/emails/:id/move': 'Move email to folder',
         'PATCH /api/emails/:id/labels/add': 'Add label to email',
         'PATCH /api/emails/:id/labels/remove': 'Remove label from email',
         'GET /api/emails/labels': 'Get email labels',
@@ -221,22 +219,13 @@ process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
 // Start server
-const server = app.listen(PORT, async () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Email API server running on port ${PORT}`);
   console.log(`📚 API documentation available at http://localhost:${PORT}/api`);
   console.log(`💚 Health check available at http://localhost:${PORT}/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🗄️  Database: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`);
   console.log(`⏰ Data retention: ${process.env.DATA_RETENTION_HOURS || '48'} hours`);
-  
-  // Seed database on startup
-  try {
-    console.log('🌱 Seeding database with initial data...');
-    await seedDatabase();
-    console.log('✅ Database seeding completed');
-  } catch (error) {
-    console.log('⚠️  Database seeding failed (this is normal if data already exists):', error);
-  }
   
   // Schedule cleanup after server starts
   scheduleCleanup();
