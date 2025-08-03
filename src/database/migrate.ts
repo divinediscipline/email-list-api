@@ -1,4 +1,5 @@
 import pool from './config';
+import seedDatabase from './seed';
 
 const createTables = async () => {
   const client = await pool.connect();
@@ -152,6 +153,12 @@ const runMigrations = async () => {
   try {
     await createTables();
     console.log('✅ Database migration completed successfully');
+    
+    // Seed the database with initial data
+    console.log('🌱 Seeding database with initial data...');
+    await seedDatabase();
+    console.log('✅ Database seeding completed successfully');
+    
     process.exit(0);
   } catch (error) {
     console.error('❌ Migration failed:', error);
