@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { EmailService } from '../services/emailService';
-import { EmailFilters, PaginationParams, EmailFolder, ApiResponse, AuthenticatedRequest } from '../types';
+import { EmailFilters, PaginationParams, ApiResponse, AuthenticatedRequest } from '../types';
 
 const emailService = new EmailService();
 
@@ -25,7 +25,7 @@ export class EmailController {
       const sortOrder = req.query.sortOrder as 'asc' | 'desc';
 
       const filters: EmailFilters = {
-        folder: req.query.folder as EmailFolder,
+        view: req.query.view as 'inbox' | 'starred' | 'important' | 'unread' | 'sent' | 'drafts' | 'trash',
         labels: req.query.labels ? (req.query.labels as string).split(',') : undefined,
         isRead: req.query.isRead !== undefined ? req.query.isRead === 'true' : undefined,
         isStarred: req.query.isStarred !== undefined ? req.query.isStarred === 'true' : undefined,
@@ -221,57 +221,6 @@ export class EmailController {
     }
   }
 
-  async moveToFolder(req: Request, res: Response): Promise<void> {
-    try {
-      const { id } = req.params;
-      if (!id) {
-        const response: ApiResponse<null> = {
-          success: false,
-          error: 'Email ID is required'
-        };
-        res.status(400).json(response);
-        return;
-      }
-
-      const { folder } = req.body;
-      
-      if (!folder) {
-        const response: ApiResponse<null> = {
-          success: false,
-          error: 'Folder is required'
-        };
-        res.status(400).json(response);
-        return;
-      }
-
-      const email = await emailService.moveToFolder(id, folder);
-      
-      if (!email) {
-        const response: ApiResponse<null> = {
-          success: false,
-          error: 'Email not found'
-        };
-        res.status(404).json(response);
-        return;
-      }
-
-      const response: ApiResponse<typeof email> = {
-        success: true,
-        data: email,
-        message: `Email moved to ${folder}`
-      };
-      
-      res.status(200).json(response);
-    } catch (error) {
-      const response: ApiResponse<null> = {
-        success: false,
-        error: error instanceof Error ? error.message : 'Failed to move email'
-      };
-      
-      res.status(500).json(response);
-    }
-  }
-
   async addLabel(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
@@ -281,6 +230,17 @@ export class EmailController {
           error: 'Email ID is required'
         };
         res.status(400).json(response);
+        return;
+      }
+
+      const authenticatedReq = req as AuthenticatedRequest;
+      const userId = authenticatedReq.user?.userId;
+      if (!userId) {
+        const response: ApiResponse<null> = {
+          success: false,
+          error: 'User not authenticated'
+        };
+        res.status(401).json(response);
         return;
       }
 
@@ -295,7 +255,7 @@ export class EmailController {
         return;
       }
 
-      const email = await emailService.addLabel(id, label);
+      const email = await emailService.addLabel(id, label, userId);
       
       if (!email) {
         const response: ApiResponse<null> = {
@@ -335,6 +295,17 @@ export class EmailController {
         return;
       }
 
+      const authenticatedReq = req as AuthenticatedRequest;
+      const userId = authenticatedReq.user?.userId;
+      if (!userId) {
+        const response: ApiResponse<null> = {
+          success: false,
+          error: 'User not authenticated'
+        };
+        res.status(401).json(response);
+        return;
+      }
+
       const { label } = req.body;
       
       if (!label) {
@@ -346,7 +317,7 @@ export class EmailController {
         return;
       }
 
-      const email = await emailService.removeLabel(id, label);
+      const email = await emailService.removeLabel(id, label, userId);
       
       if (!email) {
         const response: ApiResponse<null> = {

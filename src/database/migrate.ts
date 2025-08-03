@@ -18,7 +18,7 @@ const createTables = async () => {
       )
     `);
 
-    // Create emails table
+    // Create emails table (removed folder column)
     await client.query(`
       CREATE TABLE IF NOT EXISTS emails (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -31,7 +31,6 @@ const createTables = async () => {
         is_starred BOOLEAN DEFAULT FALSE,
         is_important BOOLEAN DEFAULT FALSE,
         has_attachments BOOLEAN DEFAULT FALSE,
-        folder VARCHAR(50) DEFAULT 'inbox',
         timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -102,9 +101,11 @@ const createTables = async () => {
     // Create indexes for better performance
     await client.query(`
       CREATE INDEX IF NOT EXISTS idx_emails_user_id ON emails(user_id);
-      CREATE INDEX IF NOT EXISTS idx_emails_folder ON emails(folder);
       CREATE INDEX IF NOT EXISTS idx_emails_timestamp ON emails(timestamp);
       CREATE INDEX IF NOT EXISTS idx_emails_created_at ON emails(created_at);
+      CREATE INDEX IF NOT EXISTS idx_emails_is_starred ON emails(is_starred);
+      CREATE INDEX IF NOT EXISTS idx_emails_is_important ON emails(is_important);
+      CREATE INDEX IF NOT EXISTS idx_emails_is_read ON emails(is_read);
       CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
       CREATE INDEX IF NOT EXISTS idx_messages_user_id ON messages(user_id);
       CREATE INDEX IF NOT EXISTS idx_attachments_email_id ON attachments(email_id);

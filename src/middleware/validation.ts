@@ -30,7 +30,8 @@ export const validateRegister = [
 export const validateEmailFilters = [
   query('page').optional().isInt({ min: 1 }).withMessage('Page must be a positive integer'),
   query('limit').optional().isInt({ min: 1, max: 100 }).withMessage('Limit must be between 1 and 100'),
-  query('folder').optional().isIn(['inbox', 'starred', 'sent', 'important', 'drafts', 'trash']).withMessage('Invalid folder'),
+  query('view').optional().isIn(['inbox', 'starred', 'important', 'unread', 'sent', 'drafts', 'trash']).withMessage('Invalid view'),
+  query('labels').optional().isString().withMessage('Labels must be a comma-separated string'),
   query('isRead').optional().isBoolean().withMessage('isRead must be a boolean'),
   query('isStarred').optional().isBoolean().withMessage('isStarred must be a boolean'),
   query('isImportant').optional().isBoolean().withMessage('isImportant must be a boolean'),

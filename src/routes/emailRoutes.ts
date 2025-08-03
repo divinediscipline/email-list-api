@@ -26,7 +26,6 @@ router.delete('/:id', validateEmailId, emailController.deleteEmail.bind(emailCon
 router.patch('/:id/read', validateEmailId, emailController.markAsRead.bind(emailController));
 router.patch('/:id/star', validateEmailId, emailController.toggleStar.bind(emailController));
 router.patch('/:id/important', validateEmailId, emailController.toggleImportant.bind(emailController));
-router.patch('/:id/move', validateEmailId, emailController.moveToFolder.bind(emailController));
 router.patch('/:id/labels/add', validateEmailId, emailController.addLabel.bind(emailController));
 router.patch('/:id/labels/remove', validateEmailId, emailController.removeLabel.bind(emailController));
 

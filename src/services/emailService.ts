@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from 'uuid';
-import { Email, EmailFilters, PaginationParams, EmailLabel, EmailFolder } from '../types';
+import { Email, EmailFilters, PaginationParams, EmailLabel } from '../types';
 import databaseService from './databaseService';
 
 export class EmailService {
@@ -114,26 +114,21 @@ export class EmailService {
     }
   }
 
-  async moveToFolder(id: string, folder: EmailFolder): Promise<Email | null> {
+  async addLabel(id: string, labelName: string, userId: string): Promise<Email | null> {
     try {
-      const email = await databaseService.updateEmail(id, { folder });
-      if (!email) return null;
-      
-      const attachments = await databaseService.getAttachmentsByEmailId(id);
-      return {
-        ...email,
-        attachments
-      };
-    } catch (error) {
-      console.error('Error moving email to folder:', error);
-      throw error;
-    }
-  }
+      // Get or create the label
+      let label = await databaseService.getLabelByName(userId, labelName);
+      if (!label) {
+        // Create a new label with a default color
+        const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7', '#DDA0DD', '#98D8C8'];
+        const randomColor = colors[Math.floor(Math.random() * colors.length)] || '#FF6B6B';
+        label = await databaseService.createEmailLabel({ userId, name: labelName, color: randomColor });
+      }
 
-  async addLabel(id: string, label: string): Promise<Email | null> {
-    try {
-      // This would need to be implemented with the label mapping table
-      // For now, we'll just return the email as is
+      // Add the label to the email
+      await databaseService.addLabelToEmail(id, label.id);
+      
+      // Get the updated email with labels
       const email = await databaseService.getEmailById(id);
       if (!email) return null;
       
@@ -148,10 +143,16 @@ export class EmailService {
     }
   }
 
-  async removeLabel(id: string, label: string): Promise<Email | null> {
+  async removeLabel(id: string, labelName: string, userId: string): Promise<Email | null> {
     try {
-      // This would need to be implemented with the label mapping table
-      // For now, we'll just return the email as is
+      // Get the label
+      const label = await databaseService.getLabelByName(userId, labelName);
+      if (!label) return null;
+
+      // Remove the label from the email
+      await databaseService.removeLabelFromEmail(id, label.id);
+      
+      // Get the updated email with labels
       const email = await databaseService.getEmailById(id);
       if (!email) return null;
       
@@ -193,14 +194,15 @@ export class EmailService {
     }
   }
 
-  async getEmailCounts(userId: string): Promise<Record<EmailFolder, number>> {
+  async getEmailCounts(userId: string): Promise<Record<string, number>> {
     try {
       const counts = await databaseService.getEmailCounts(userId);
       return {
         inbox: counts.inbox || 0,
         starred: counts.starred || 0,
-        sent: counts.sent || 0,
         important: counts.important || 0,
+        unread: counts.unread || 0,
+        sent: counts.sent || 0,
         drafts: counts.drafts || 0,
         trash: counts.trash || 0
       };

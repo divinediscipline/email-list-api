@@ -74,13 +74,13 @@ export class DatabaseService {
     const client = await pool.connect();
     try {
       const result = await client.query(`
-        INSERT INTO emails (user_id, "from", "to", subject, body, is_read, is_starred, is_important, has_attachments, folder, timestamp)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO emails (user_id, "from", "to", subject, body, is_read, is_starred, is_important, has_attachments, timestamp)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
         RETURNING *
       `, [
         emailData.userId, emailData.from, emailData.to, emailData.subject, emailData.body,
         emailData.isRead, emailData.isStarred, emailData.isImportant, emailData.hasAttachments,
-        emailData.folder, emailData.timestamp
+        emailData.timestamp
       ]);
       
       return result.rows[0];
@@ -96,54 +96,93 @@ export class DatabaseService {
   ): Promise<{ emails: Email[]; total: number }> {
     const client = await pool.connect();
     try {
-      let whereClause = 'WHERE user_id = $1';
+      let whereClause = 'WHERE e.user_id = $1';
       const params: any[] = [userId];
       let paramIndex = 2;
 
-      if (filters.folder) {
-        whereClause += ` AND folder = $${paramIndex}`;
-        params.push(filters.folder);
-        paramIndex++;
+      // Handle view filters
+      if (filters.view) {
+        switch (filters.view) {
+          case 'starred':
+            whereClause += ` AND e.is_starred = true`;
+            break;
+          case 'important':
+            whereClause += ` AND e.is_important = true`;
+            break;
+          case 'unread':
+            whereClause += ` AND e.is_read = false`;
+            break;
+          case 'sent':
+            // For sent emails, we'd need to implement a different logic
+            // For now, we'll treat it as a special case
+            break;
+          case 'drafts':
+            // For drafts, we'd need to implement a different logic
+            // For now, we'll treat it as a special case
+            break;
+          case 'trash':
+            // For trash, we'd need to implement a different logic
+            // For now, we'll treat it as a special case
+            break;
+        }
       }
 
       if (filters.isRead !== undefined) {
-        whereClause += ` AND is_read = $${paramIndex}`;
+        whereClause += ` AND e.is_read = $${paramIndex}`;
         params.push(filters.isRead);
         paramIndex++;
       }
 
       if (filters.isStarred !== undefined) {
-        whereClause += ` AND is_starred = $${paramIndex}`;
+        whereClause += ` AND e.is_starred = $${paramIndex}`;
         params.push(filters.isStarred);
         paramIndex++;
       }
 
       if (filters.isImportant !== undefined) {
-        whereClause += ` AND is_important = $${paramIndex}`;
+        whereClause += ` AND e.is_important = $${paramIndex}`;
         params.push(filters.isImportant);
         paramIndex++;
       }
 
       if (filters.search) {
-        whereClause += ` AND (subject ILIKE $${paramIndex} OR "from" ILIKE $${paramIndex} OR body ILIKE $${paramIndex})`;
+        whereClause += ` AND (e.subject ILIKE $${paramIndex} OR e."from" ILIKE $${paramIndex} OR e.body ILIKE $${paramIndex})`;
         params.push(`%${filters.search}%`);
         paramIndex++;
       }
 
+      // Handle label filtering
+      if (filters.labels && filters.labels.length > 0) {
+        const labelPlaceholders = filters.labels.map((_: any, index: number) => `$${paramIndex + index}`).join(',');
+        whereClause += ` AND e.id IN (
+          SELECT email_id FROM email_label_mappings elm
+          JOIN email_labels el ON elm.label_id = el.id
+          WHERE el.name IN (${labelPlaceholders}) AND el.user_id = $1
+        )`;
+        params.push(...filters.labels);
+        paramIndex += filters.labels.length;
+      }
+
       // Get total count
       const countResult = await client.query(`
-        SELECT COUNT(*) FROM emails ${whereClause}
+        SELECT COUNT(*) FROM emails e ${whereClause}
       `, params);
       const total = parseInt(countResult.rows[0].count);
 
-      // Get paginated results
+      // Get paginated results with labels
       const offset = (pagination.page - 1) * pagination.limit;
       const sortBy = pagination.sortBy || 'timestamp';
       const sortOrder = pagination.sortOrder || 'desc';
       
       const result = await client.query(`
-        SELECT * FROM emails ${whereClause}
-        ORDER BY ${sortBy} ${sortOrder}
+        SELECT e.*, 
+               ARRAY_AGG(DISTINCT el.name) FILTER (WHERE el.name IS NOT NULL) as labels
+        FROM emails e
+        LEFT JOIN email_label_mappings elm ON e.id = elm.email_id
+        LEFT JOIN email_labels el ON elm.label_id = el.id AND el.user_id = e.user_id
+        ${whereClause}
+        GROUP BY e.id
+        ORDER BY e.${sortBy} ${sortOrder}
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
       `, [...params, pagination.limit, offset]);
 
@@ -159,7 +198,15 @@ export class DatabaseService {
   async getEmailById(id: string): Promise<Email | null> {
     const client = await pool.connect();
     try {
-      const result = await client.query('SELECT * FROM emails WHERE id = $1', [id]);
+      const result = await client.query(`
+        SELECT e.*, 
+               ARRAY_AGG(DISTINCT el.name) FILTER (WHERE el.name IS NOT NULL) as labels
+        FROM emails e
+        LEFT JOIN email_label_mappings elm ON e.id = elm.email_id
+        LEFT JOIN email_labels el ON elm.label_id = el.id
+        WHERE e.id = $1
+        GROUP BY e.id
+      `, [id]);
       return result.rows[0] || null;
     } finally {
       client.release();
@@ -171,19 +218,21 @@ export class DatabaseService {
     try {
       // Map camelCase property names to snake_case column names
       const columnMapping: Record<string, string> = {
+        userId: 'user_id',
         isRead: 'is_read',
         isStarred: 'is_starred',
         isImportant: 'is_important',
         hasAttachments: 'has_attachments',
-        userId: 'user_id',
         createdAt: 'created_at',
         updatedAt: 'updated_at'
       };
 
       const mappedUpdates: Record<string, any> = {};
       Object.keys(updates).forEach(key => {
-        const columnName = columnMapping[key] || key;
-        mappedUpdates[columnName] = updates[key as keyof Email];
+        if (key !== 'labels' && key !== 'attachments') { // Skip labels and attachments
+          const columnName = columnMapping[key] || key;
+          mappedUpdates[columnName] = updates[key as keyof Email];
+        }
       });
 
       const fields = Object.keys(mappedUpdates).map((key, index) => `"${key}" = $${index + 2}`).join(', ');
@@ -213,26 +262,25 @@ export class DatabaseService {
     const client = await pool.connect();
     try {
       const result = await client.query(`
-        SELECT folder, COUNT(*) as count
+        SELECT 
+          COUNT(*) as inbox,
+          COUNT(*) FILTER (WHERE is_starred = true) as starred,
+          COUNT(*) FILTER (WHERE is_important = true) as important,
+          COUNT(*) FILTER (WHERE is_read = false) as unread
         FROM emails
         WHERE user_id = $1
-        GROUP BY folder
       `, [userId]);
       
-      const counts: Record<string, number> = {
-        inbox: 0,
-        starred: 0,
-        sent: 0,
-        important: 0,
-        drafts: 0,
-        trash: 0
+      const row = result.rows[0];
+      return {
+        inbox: parseInt(row.inbox),
+        starred: parseInt(row.starred),
+        important: parseInt(row.important),
+        unread: parseInt(row.unread),
+        sent: 0, // Will be implemented when sent emails are supported
+        drafts: 0, // Will be implemented when drafts are supported
+        trash: 0 // Will be implemented when trash is supported
       };
-      
-      result.rows.forEach(row => {
-        counts[row.folder] = parseInt(row.count);
-      });
-      
-      return counts;
     } finally {
       client.release();
     }
@@ -269,6 +317,46 @@ export class DatabaseService {
     try {
       const result = await client.query('DELETE FROM email_labels WHERE id = $1', [id]);
       return (result.rowCount || 0) > 0;
+    } finally {
+      client.release();
+    }
+  }
+
+  async addLabelToEmail(emailId: string, labelId: string): Promise<boolean> {
+    const client = await pool.connect();
+    try {
+      const result = await client.query(`
+        INSERT INTO email_label_mappings (email_id, label_id)
+        VALUES ($1, $2)
+        ON CONFLICT DO NOTHING
+      `, [emailId, labelId]);
+      return true;
+    } finally {
+      client.release();
+    }
+  }
+
+  async removeLabelFromEmail(emailId: string, labelId: string): Promise<boolean> {
+    const client = await pool.connect();
+    try {
+      const result = await client.query(`
+        DELETE FROM email_label_mappings 
+        WHERE email_id = $1 AND label_id = $2
+      `, [emailId, labelId]);
+      return (result.rowCount || 0) > 0;
+    } finally {
+      client.release();
+    }
+  }
+
+  async getLabelByName(userId: string, labelName: string): Promise<EmailLabel | null> {
+    const client = await pool.connect();
+    try {
+      const result = await client.query(`
+        SELECT * FROM email_labels 
+        WHERE user_id = $1 AND name = $2
+      `, [userId, labelName]);
+      return result.rows[0] || null;
     } finally {
       client.release();
     }
@@ -312,10 +400,7 @@ export class DatabaseService {
     try {
       // Map camelCase property names to snake_case column names
       const columnMapping: Record<string, string> = {
-        userId: 'user_id',
-        isRead: 'is_read',
-        createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        isRead: 'is_read'
       };
 
       const mappedUpdates: Record<string, any> = {};
@@ -385,10 +470,7 @@ export class DatabaseService {
     try {
       // Map camelCase property names to snake_case column names
       const columnMapping: Record<string, string> = {
-        userId: 'user_id',
-        isRead: 'is_read',
-        createdAt: 'created_at',
-        updatedAt: 'updated_at'
+        isRead: 'is_read'
       };
 
       const mappedUpdates: Record<string, any> = {};
@@ -449,24 +531,31 @@ export class DatabaseService {
     }
   }
 
-  // Cleanup old data
+  // Cleanup operations
   async cleanupOldData(retentionHours: number): Promise<void> {
     const client = await pool.connect();
     try {
+      const cutoffTime = new Date(Date.now() - retentionHours * 60 * 60 * 1000);
+      
+      // Clean up old emails
       await client.query(`
         DELETE FROM emails 
-        WHERE created_at < NOW() - INTERVAL '${retentionHours} hours'
-      `);
+        WHERE created_at < $1
+      `, [cutoffTime]);
       
+      // Clean up old notifications
       await client.query(`
         DELETE FROM notifications 
-        WHERE created_at < NOW() - INTERVAL '${retentionHours} hours'
-      `);
+        WHERE created_at < $1
+      `, [cutoffTime]);
       
+      // Clean up old messages
       await client.query(`
         DELETE FROM messages 
-        WHERE created_at < NOW() - INTERVAL '${retentionHours} hours'
-      `);
+        WHERE created_at < $1
+      `, [cutoffTime]);
+      
+      console.log(`✅ Cleaned up data older than ${retentionHours} hours`);
     } finally {
       client.release();
     }

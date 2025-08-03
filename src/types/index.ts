@@ -24,7 +24,6 @@ export interface Email {
   hasAttachments: boolean;
   attachments: Attachment[];
   labels: string[];
-  folder: EmailFolder;
   timestamp: Date;
   createdAt: Date;
   updatedAt: Date;
@@ -38,8 +37,6 @@ export interface Attachment {
   type: string;
   url: string;
 }
-
-export type EmailFolder = 'inbox' | 'starred' | 'sent' | 'important' | 'drafts' | 'trash';
 
 export interface EmailLabel {
   id: string;
@@ -95,7 +92,7 @@ export interface PaginationParams {
 }
 
 export interface EmailFilters {
-  folder?: EmailFolder;
+  view?: 'inbox' | 'starred' | 'important' | 'unread' | 'sent' | 'drafts' | 'trash';
   labels?: string[];
   isRead?: boolean;
   isStarred?: boolean;

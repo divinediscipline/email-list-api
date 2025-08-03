@@ -58,7 +58,6 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: true,
-        folder: 'inbox',
         labels: ['Work']
       },
       {
@@ -70,7 +69,6 @@ const seedDatabase = async () => {
         isStarred: false,
         isImportant: false,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Personal']
       },
       {
@@ -82,7 +80,6 @@ const seedDatabase = async () => {
         isStarred: false,
         isImportant: false,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Work']
       },
       {
@@ -94,44 +91,7 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: true,
-        folder: 'inbox',
         labels: ['Travel', 'Personal']
-      },
-      {
-        from: 'orders@amazon.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'Your Amazon order #123-4567890-1234567 has shipped',
-        body: 'Your order containing "Wireless Bluetooth Headphones" has shipped and is expected to arrive on March 12. Track your package here.',
-        isRead: true,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Shopping']
-      },
-      {
-        from: 'team@slack.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'Sarah Johnson joined #general',
-        body: 'Sarah Johnson has joined the #general channel. Welcome to the team!',
-        isRead: true,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Work']
-      },
-      {
-        from: 'noreply@spotify.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'Your weekly mix is ready',
-        body: 'Your personalized weekly mix featuring artists like Taylor Swift, Ed Sheeran, and The Weeknd is ready to stream. Discover new music tailored just for you.',
-        isRead: false,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Personal']
       },
       {
         from: 'security@chase.com',
@@ -142,7 +102,6 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Finance']
       },
       {
@@ -154,32 +113,7 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Health']
-      },
-      {
-        from: 'newsletter@techcrunch.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'TechCrunch Daily: Latest in Tech News',
-        body: 'Today\'s top stories: Apple announces new iPhone features, Google releases Android 15 beta, and startup funding reaches new heights in Q1.',
-        isRead: false,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Work']
-      },
-      {
-        from: 'support@uber.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'Your ride receipt from yesterday',
-        body: 'Here\'s your receipt for your Uber ride from San Francisco Airport to Downtown. Total: $45.20. Thank you for choosing Uber!',
-        isRead: true,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: true,
-        folder: 'inbox',
-        labels: ['Travel']
       },
       {
         from: 'noreply@github.com',
@@ -190,20 +124,7 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Work']
-      },
-      {
-        from: 'orders@starbucks.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'Your Starbucks order is ready for pickup',
-        body: 'Your grande caramel macchiato is ready for pickup at the Market Street location. Order #98765. Thank you for using the Starbucks app!',
-        isRead: true,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Personal']
       },
       {
         from: 'team@asana.com',
@@ -214,7 +135,6 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: true,
-        folder: 'inbox',
         labels: ['Work']
       },
       {
@@ -226,7 +146,6 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: true,
-        folder: 'inbox',
         labels: ['Work', 'Travel']
       },
       {
@@ -235,10 +154,9 @@ const seedDatabase = async () => {
         subject: 'Storage alert: You\'re using 85% of your space',
         body: 'You\'re currently using 8.5 GB of your 10 GB Dropbox storage. Consider upgrading to get more space or clean up old files.',
         isRead: false,
-        isStarred: false,
+        isStarred: true,
         isImportant: false,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Work']
       },
       {
@@ -250,20 +168,7 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Work']
-      },
-      {
-        from: 'orders@sephora.com',
-        to: 'sarah.johnson@techcorp.com',
-        subject: 'Your Sephora order has been delivered',
-        body: 'Your order containing "La Mer moisturizer" has been delivered to your doorstep. Please check your package and let us know if everything is as expected.',
-        isRead: true,
-        isStarred: false,
-        isImportant: false,
-        hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Shopping']
       },
       {
         from: 'noreply@calendly.com',
@@ -274,7 +179,6 @@ const seedDatabase = async () => {
         isStarred: true,
         isImportant: true,
         hasAttachments: false,
-        folder: 'inbox',
         labels: ['Work']
       },
       {
@@ -283,77 +187,160 @@ const seedDatabase = async () => {
         subject: 'Your Amazon Prime membership expires in 7 days',
         body: 'Your Amazon Prime membership will expire on March 20. Renew now to continue enjoying free shipping, Prime Video, and other benefits.',
         isRead: false,
+        isStarred: true,
+        isImportant: false,
+        hasAttachments: false,
+        labels: ['Shopping', 'Personal']
+      },
+      {
+        from: 'orders@starbucks.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'Your Starbucks order is ready for pickup',
+        body: 'Your grande caramel macchiato is ready for pickup at the Market Street location. Order #98765. Thank you for using the Starbucks app!',
+        isRead: true,
+        isStarred: true,
+        isImportant: false,
+        hasAttachments: false,
+        labels: ['Personal']
+      },
+      {
+        from: 'support@uber.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'Your ride receipt from yesterday',
+        body: 'Here\'s your receipt for your Uber ride from San Francisco Airport to Downtown. Total: $45.20. Thank you for choosing Uber!',
+        isRead: true,
+        isStarred: true,
+        isImportant: false,
+        hasAttachments: true,
+        labels: ['Travel', 'Finance']
+      },
+      {
+        from: 'noreply@spotify.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'New releases from artists you follow',
+        body: 'Check out the latest releases from artists you follow on Spotify. New music from Taylor Swift, The Weeknd, and more!',
+        isRead: true,
         isStarred: false,
         isImportant: false,
         hasAttachments: false,
-        folder: 'inbox',
-        labels: ['Shopping']
+        labels: ['Personal']
+      },
+      {
+        from: 'support@slack.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'Weekly digest: Your team activity',
+        body: 'Here\'s your weekly digest of team activity. You have 15 unread messages and 3 mentions. Stay connected with your team!',
+        isRead: true,
+        isStarred: false,
+        isImportant: false,
+        hasAttachments: false,
+        labels: ['Work']
+      },
+      {
+        from: 'noreply@trello.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'Card due soon: Complete project proposal',
+        body: 'The card "Complete project proposal" is due in 2 days. Make sure to update the status and add any final touches.',
+        isRead: true,
+        isStarred: false,
+        isImportant: true,
+        hasAttachments: false,
+        labels: ['Work']
+      },
+      {
+        from: 'support@figma.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'Design file shared with you',
+        body: 'A new design file has been shared with you. "Mobile App UI Design" is now available for your review and feedback.',
+        isRead: true,
+        isStarred: false,
+        isImportant: false,
+        hasAttachments: false,
+        labels: ['Work']
+      },
+      {
+        from: 'noreply@notion.com',
+        to: 'sarah.johnson@techcorp.com',
+        subject: 'Page updated: Project documentation',
+        body: 'The page "Project documentation" has been updated by your teammate. Review the changes and provide feedback if needed.',
+        isRead: true,
+        isStarred: false,
+        isImportant: false,
+        hasAttachments: false,
+        labels: ['Work']
       }
     ];
-    
-    for (const emailData of sampleEmails) {
+
+    // Create label mapping for easy lookup
+    const labelMap = new Map();
+    for (const label of labels) {
+      labelMap.set(label.name, label.id);
+    }
+
+    // Insert emails and create label mappings
+    for (const email of sampleEmails) {
       const emailId = uuidv4();
       
+      // Insert email (without folder)
       await client.query(`
-        INSERT INTO emails (id, user_id, "from", "to", subject, body, is_read, is_starred, is_important, has_attachments, folder)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        INSERT INTO emails (id, user_id, "from", "to", subject, body, is_read, is_starred, is_important, has_attachments)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       `, [
-        emailId, userId, emailData.from, emailData.to, emailData.subject, emailData.body,
-        emailData.isRead, emailData.isStarred, emailData.isImportant, emailData.hasAttachments, emailData.folder
+        emailId, userId, email.from, email.to, email.subject, email.body,
+        email.isRead, email.isStarred, email.isImportant, email.hasAttachments
       ]);
-      
-      // Add labels to email
-      for (const labelName of emailData.labels) {
-        const label = labels.find(l => l.name === labelName);
-        if (label) {
+
+      // Create label mappings
+      for (const labelName of email.labels) {
+        const labelId = labelMap.get(labelName);
+        if (labelId) {
           await client.query(`
             INSERT INTO email_label_mappings (email_id, label_id)
             VALUES ($1, $2)
-          `, [emailId, label.id]);
+          `, [emailId, labelId]);
         }
       }
-      
-      // Add attachment if email has attachments
-      if (emailData.hasAttachments) {
-        const attachmentTypes = ['application/pdf', 'image/jpeg', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-        const attachmentNames = ['document.pdf', 'screenshot.jpg', 'report.docx'];
-        
-        const randomType = attachmentTypes[Math.floor(Math.random() * attachmentTypes.length)];
-        const randomName = attachmentNames[Math.floor(Math.random() * attachmentNames.length)];
-        const randomSize = Math.floor(Math.random() * 5000000) + 100000; // 100KB to 5MB
-        
+
+      // Create attachments for emails that have them
+      if (email.hasAttachments) {
+        const attachmentId = uuidv4();
         await client.query(`
-          INSERT INTO attachments (email_id, filename, size, type, url)
-          VALUES ($1, $2, $3, $4, $5)
-        `, [emailId, randomName, randomSize, randomType, `/uploads/${randomName}`]);
+          INSERT INTO attachments (id, email_id, filename, size, type, url)
+          VALUES ($1, $2, $3, $4, $5, $6)
+        `, [
+          attachmentId, emailId, 'screenshot.jpg', 
+          Math.floor(Math.random() * 5000000) + 1000000, // Random size between 1-6MB
+          'image/jpeg', '/uploads/screenshot.jpg'
+        ]);
       }
     }
-    console.log('✅ Created 20 sample emails with labels and attachments');
-    
+    console.log('✅ Created 20 sample emails with labels');
+
     // Create 20 sample notifications
     const notifications = [
-      { title: 'Welcome to Email API', message: 'Your account has been successfully created. Welcome to our email service!', type: 'success' },
-      { title: 'New Feature Available', message: 'We have added new email filtering and labeling features to improve your experience.', type: 'info' },
-      { title: 'Security Update', message: 'Your account security has been enhanced with two-factor authentication.', type: 'warning' },
-      { title: 'Storage Alert', message: 'You are using 85% of your email storage. Consider upgrading your plan.', type: 'warning' },
-      { title: 'Backup Complete', message: 'Your email data has been successfully backed up to our secure servers.', type: 'success' },
-      { title: 'Maintenance Notice', message: 'Scheduled maintenance will occur tonight at 2 AM EST. Service may be temporarily unavailable.', type: 'info' },
-      { title: 'New Device Login', message: 'A new device has logged into your account from San Francisco, CA.', type: 'warning' },
-      { title: 'Password Updated', message: 'Your password has been successfully updated. If this wasn\'t you, please contact support.', type: 'success' },
-      { title: 'Email Sync Complete', message: 'All your emails have been synchronized across all your devices.', type: 'success' },
-      { title: 'Storage Upgrade', message: 'Your storage plan has been upgraded to 50GB. Enjoy the extra space!', type: 'success' },
-      { title: 'Account Verification', message: 'Please verify your email address to complete your account setup.', type: 'warning' },
-      { title: 'New Label Created', message: 'Your new email label "Work" has been created successfully.', type: 'success' },
-      { title: 'Email Deleted', message: 'The selected email has been moved to trash. You can restore it within 30 days.', type: 'info' },
-      { title: 'Filter Applied', message: 'Your new email filter has been applied to incoming messages.', type: 'success' },
-      { title: 'Backup Failed', message: 'Your email backup failed. Please try again or contact support.', type: 'error' },
-      { title: 'Account Locked', message: 'Your account has been temporarily locked due to multiple failed login attempts.', type: 'error' },
-      { title: 'Email Restored', message: 'The deleted email has been successfully restored to your inbox.', type: 'success' },
-      { title: 'New Contact Added', message: 'A new contact has been added to your address book.', type: 'success' },
-      { title: 'Sync Error', message: 'There was an error syncing your emails. Please check your internet connection.', type: 'error' },
-      { title: 'Premium Features', message: 'Upgrade to premium to unlock advanced features like unlimited storage and priority support.', type: 'info' }
+      { title: 'New email received', message: 'You have a new email from hr@techcorp.com', type: 'info' },
+      { title: 'Meeting reminder', message: 'Team sync meeting starts in 15 minutes', type: 'warning' },
+      { title: 'Task completed', message: 'Project proposal has been submitted successfully', type: 'success' },
+      { title: 'System update', message: 'Email system will be updated tonight at 2 AM', type: 'info' },
+      { title: 'Storage warning', message: 'You\'re running low on storage space', type: 'warning' },
+      { title: 'Backup completed', message: 'Your emails have been backed up successfully', type: 'success' },
+      { title: 'New feature available', message: 'Email labels feature is now available', type: 'info' },
+      { title: 'Security alert', message: 'New login detected from San Francisco', type: 'warning' },
+      { title: 'Subscription renewed', message: 'Your premium subscription has been renewed', type: 'success' },
+      { title: 'Maintenance scheduled', message: 'System maintenance scheduled for tomorrow', type: 'info' },
+      { title: 'Password expired', message: 'Your password will expire in 3 days', type: 'warning' },
+      { title: 'Sync completed', message: 'All emails have been synchronized', type: 'success' },
+      { title: 'New contact added', message: 'John Smith has been added to your contacts', type: 'info' },
+      { title: 'Quota exceeded', message: 'You\'ve exceeded your monthly email quota', type: 'warning' },
+      { title: 'Update available', message: 'A new version of the email client is available', type: 'info' },
+      { title: 'Backup failed', message: 'Email backup failed. Please try again', type: 'error' },
+      { title: 'Connection restored', message: 'Email server connection has been restored', type: 'success' },
+      { title: 'Filter created', message: 'New email filter has been created successfully', type: 'success' },
+      { title: 'Import completed', message: 'Email import from Gmail completed', type: 'success' },
+      { title: 'Account locked', message: 'Your account has been temporarily locked', type: 'error' },
+      { title: 'Welcome back', message: 'Welcome back! You have 5 unread messages', type: 'info' }
     ];
-    
+
     for (const notification of notifications) {
       await client.query(`
         INSERT INTO notifications (user_id, title, message, type)
@@ -361,31 +348,32 @@ const seedDatabase = async () => {
       `, [userId, notification.title, notification.message, notification.type]);
     }
     console.log('✅ Created 20 sample notifications');
-    
+
     // Create 20 sample messages
     const messages = [
-      { title: 'System Maintenance', content: 'Scheduled maintenance will occur tonight at 2 AM EST. Service may be temporarily unavailable during this time.', type: 'system' },
-      { title: 'Account Update', content: 'Your account settings have been updated successfully. All changes have been applied.', type: 'user' },
-      { title: 'Welcome Message', content: 'Welcome to our email service! We\'re excited to have you on board. Explore our features and let us know if you need help.', type: 'system' },
-      { title: 'Security Alert', content: 'We detected unusual activity on your account. Please review your recent login activity.', type: 'system' },
-      { title: 'Feature Announcement', content: 'We\'ve added new email templates and advanced search features. Check them out in your settings.', type: 'system' },
-      { title: 'Storage Warning', content: 'You\'re approaching your storage limit. Consider deleting old emails or upgrading your plan.', type: 'system' },
-      { title: 'Backup Status', content: 'Your email backup completed successfully. Your data is safe and secure.', type: 'system' },
-      { title: 'New Device', content: 'A new device has been authorized for your account. If this wasn\'t you, please change your password.', type: 'system' },
-      { title: 'Password Reset', content: 'Your password has been reset successfully. Please log in with your new password.', type: 'user' },
-      { title: 'Email Recovery', content: 'We\'ve recovered 15 emails that were accidentally deleted. They\'re now back in your inbox.', type: 'system' },
-      { title: 'Account Verification', content: 'Please verify your email address to complete your account setup and unlock all features.', type: 'system' },
-      { title: 'Premium Upgrade', content: 'Upgrade to premium to enjoy unlimited storage, priority support, and advanced features.', type: 'system' },
-      { title: 'Sync Complete', content: 'All your emails have been synchronized across all your devices. Everything is up to date.', type: 'system' },
-      { title: 'Filter Applied', content: 'Your new email filter has been applied. Incoming emails will be automatically organized.', type: 'user' },
-      { title: 'Contact Import', content: 'Your contacts have been successfully imported from your previous email service.', type: 'system' },
-      { title: 'Calendar Sync', content: 'Your calendar has been synchronized with your email account. Events are now linked.', type: 'system' },
-      { title: 'Theme Updated', content: 'Your email theme has been updated to the new dark mode. You can change it anytime in settings.', type: 'user' },
-      { title: 'Notification Settings', content: 'Your notification preferences have been updated. You\'ll now receive alerts for important emails.', type: 'user' },
-      { title: 'Data Export', content: 'Your email data export is ready for download. The file contains all your emails and contacts.', type: 'system' },
-      { title: 'Account Recovery', content: 'Your account has been successfully recovered. All your data is intact and accessible.', type: 'system' }
+      { title: 'System Message', content: 'Welcome to your email client! Get started by exploring your inbox.', type: 'system' },
+      { title: 'Tips & Tricks', content: 'Use labels to organize your emails. You can apply multiple labels to a single email.', type: 'system' },
+      { title: 'Keyboard Shortcuts', content: 'Press Ctrl+K to search, Ctrl+E to compose, and Ctrl+Enter to send.', type: 'system' },
+      { title: 'Security Notice', content: 'Your account is protected with two-factor authentication.', type: 'system' },
+      { title: 'Storage Info', content: 'You\'re using 2.5 GB of your 10 GB storage allowance.', type: 'system' },
+      { title: 'Backup Status', content: 'Your emails are automatically backed up every 24 hours.', type: 'system' },
+      { title: 'Sync Status', content: 'All emails are synchronized with the server.', type: 'system' },
+      { title: 'Feature Update', content: 'New email templates are now available for quick responses.', type: 'system' },
+      { title: 'Maintenance Notice', content: 'Scheduled maintenance will occur tonight at 2 AM EST.', type: 'system' },
+      { title: 'Performance Tip', content: 'Archive old emails to improve performance and reduce storage usage.', type: 'system' },
+      { title: 'Privacy Reminder', content: 'Your emails are encrypted and secure. We never read your messages.', type: 'system' },
+      { title: 'Support Available', content: 'Need help? Contact support at help@emailclient.com', type: 'system' },
+      { title: 'Update Available', content: 'A new version is available. Update now for the latest features.', type: 'system' },
+      { title: 'Connection Status', content: 'Connected to email server. All systems operational.', type: 'system' },
+      { title: 'Filter Applied', content: 'Your custom filter "Work Emails" has been applied to 15 messages.', type: 'system' },
+      { title: 'Import Complete', content: 'Successfully imported 1,247 emails from your previous client.', type: 'system' },
+      { title: 'Backup Complete', content: 'Your emails have been backed up to the cloud successfully.', type: 'system' },
+      { title: 'Security Scan', content: 'Security scan completed. No threats detected.', type: 'system' },
+      { title: 'Storage Cleanup', content: 'Cleaned up 500 MB of temporary files to free up space.', type: 'system' },
+      { title: 'Welcome Message', content: 'Thank you for choosing our email client. We hope you enjoy using it!', type: 'system' },
+      { title: 'Feature Guide', content: 'Check out our feature guide to learn about all available options.', type: 'system' }
     ];
-    
+
     for (const message of messages) {
       await client.query(`
         INSERT INTO messages (user_id, title, content, type)
@@ -393,16 +381,12 @@ const seedDatabase = async () => {
       `, [userId, message.title, message.content, message.type]);
     }
     console.log('✅ Created 20 sample messages');
-    
-    console.log('✅ Database seeded successfully');
-    console.log('📊 Summary:');
-    console.log('   - 1 user created');
-    console.log('   - 6 email labels created');
-    console.log('   - 20 emails with labels and attachments');
-    console.log('   - 20 notifications');
-    console.log('   - 20 messages');
-    console.log('📧 Test user: sarah.johnson@techcorp.com / SecurePass123!');
-    
+
+    console.log('🎉 Database seeding completed successfully!');
+    console.log('📧 Sample user: sarah.johnson@techcorp.com');
+    console.log('🔑 Password: SecurePass123!');
+    console.log('📊 Created: 20 emails, 20 notifications, 20 messages, 6 labels');
+
   } catch (error) {
     console.error('❌ Error seeding database:', error);
     throw error;
@@ -426,4 +410,4 @@ if (require.main === module) {
   runSeed();
 }
 
-export default seedDatabase; 
+export default runSeed; 

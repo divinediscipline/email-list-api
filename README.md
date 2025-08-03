@@ -1,13 +1,13 @@
 # Email List API
 
-A production-ready REST API for email client applications with PostgreSQL database persistence and automatic data cleanup, optimized for Render hosting.
+A production-ready REST API for email client applications with PostgreSQL database persistence and automatic data cleanup, optimized for Render hosting. Built with a Gmail-like interface where emails stay in the inbox and filtering is done through views.
 
 ## Features
 
 - 🔐 **Authentication & Authorization** - JWT-based authentication with role-based access
 - 📧 **Email Management** - Full CRUD operations for emails with filtering and pagination
-- 🏷️ **Email Labels** - Organize emails with custom labels and colors
-- 📁 **Folder Management** - Inbox, Sent, Drafts, Trash, Starred, Important folders
+- 🏷️ **Email Labels** - Organize emails with custom labels and colors (Gmail-style)
+- 👁️ **View-based Filtering** - Filter emails by starred, important, unread, etc. (no folder moving)
 - 🔔 **Notifications & Messages** - Real-time notifications and system messages
 - 🗄️ **PostgreSQL Database** - Persistent data storage with proper indexing
 - 🧹 **Automatic Cleanup** - Configurable data retention (default: 48 hours)
@@ -177,18 +177,28 @@ npm run db:seed
 
 ### Emails
 - `GET /api/emails` - Get emails with filtering and pagination
-- `GET /api/emails/counts` - Get email counts by folder
+- `GET /api/emails/counts` - Get email counts by view
 - `GET /api/emails/:id` - Get specific email
 - `DELETE /api/emails/:id` - Delete email
 - `PATCH /api/emails/:id/read` - Mark email as read
 - `PATCH /api/emails/:id/star` - Toggle email star
 - `PATCH /api/emails/:id/important` - Toggle email important
-- `PATCH /api/emails/:id/move` - Move email to folder
 
-### Labels
+### Email Views (Gmail-style filtering)
+- `GET /api/emails?view=inbox` - All emails (default)
+- `GET /api/emails?view=starred` - Starred emails
+- `GET /api/emails?view=important` - Important emails
+- `GET /api/emails?view=unread` - Unread emails
+- `GET /api/emails?view=sent` - Sent emails (future)
+- `GET /api/emails?view=drafts` - Draft emails (future)
+- `GET /api/emails?view=trash` - Deleted emails (future)
+
+### Labels (Gmail-style)
 - `GET /api/emails/labels` - Get email labels
 - `POST /api/emails/labels` - Create email label
 - `DELETE /api/emails/labels/:id` - Delete email label
+- `PATCH /api/emails/:id/labels/add` - Add label to email
+- `PATCH /api/emails/:id/labels/remove` - Remove label from email
 
 ### Notifications
 - `GET /api/notifications/notifications` - Get notifications
@@ -201,6 +211,21 @@ npm run db:seed
 - `GET /api/notifications/messages/unread-count` - Get unread count
 - `PATCH /api/notifications/messages/:id/read` - Mark as read
 - `PATCH /api/notifications/messages/mark-all-read` - Mark all as read
+
+## Email System Design
+
+### Gmail-like Interface
+- **Emails stay in inbox**: No folder moving, just view-based filtering
+- **Starring**: Toggle star status (like Gmail's star feature)
+- **Important marking**: Toggle important status
+- **Labels**: Multiple labels per email (many-to-many relationship)
+- **Views**: Filter emails by status (starred, important, unread, etc.)
+
+### Key Differences from Traditional Folders
+- Emails remain in the inbox and are filtered by their properties
+- Starring an email doesn't move it to a "starred folder"
+- Labels work like Gmail - multiple labels can be applied to one email
+- Views are just filters, not physical folder locations
 
 ## Data Retention
 
@@ -215,7 +240,7 @@ The API automatically cleans up old data to manage storage space:
 
 ### Tables
 - `users` - User accounts and authentication
-- `emails` - Email messages with metadata
+- `emails` - Email messages with metadata (no folder column)
 - `attachments` - File attachments for emails
 - `email_labels` - Custom labels for organizing emails
 - `email_label_mappings` - Many-to-many relationship between emails and labels
@@ -223,9 +248,10 @@ The API automatically cleans up old data to manage storage space:
 - `messages` - System and user messages
 
 ### Indexes
-- Email queries by user, folder, timestamp
+- Email queries by user, timestamp, starred, important, read status
 - Notification and message queries by user
 - Attachment queries by email
+- Label queries by user
 
 ## Development
 
