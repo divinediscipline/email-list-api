@@ -95,6 +95,31 @@ app.use('/api/emails', emailRoutes);
 app.use('/api/navigation', navigationRoutes);
 app.use('/api/notifications', notificationRoutes);
 
+// Root endpoint - Welcome message with available endpoints
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Welcome to Email Client API',
+    version: '1.0.0',
+    status: 'running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+    endpoints: {
+      health: `${req.protocol}://${req.get('host')}/health`,
+      documentation: `${req.protocol}://${req.get('host')}/api`,
+      authentication: `${req.protocol}://${req.get('host')}/api/auth`,
+      emails: `${req.protocol}://${req.get('host')}/api/emails`,
+      navigation: `${req.protocol}://${req.get('host')}/api/navigation`,
+      notifications: `${req.protocol}://${req.get('host')}/api/notifications`
+    },
+    sampleCredentials: {
+      email: 'sarah.johnson@techcorp.com',
+      password: 'SecurePass123!',
+      note: 'Use these credentials to test the API endpoints'
+    }
+  });
+});
+
 // API documentation endpoint
 app.get('/api', (req, res) => {
   res.json({
