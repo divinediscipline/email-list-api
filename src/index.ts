@@ -1024,6 +1024,14 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 
 // Schedule automatic data cleanup
 const scheduleCleanup = () => {
+  // Check if cleanup is enabled via environment variable (disabled by default)
+  const cleanupEnabled = process.env.ENABLE_DATA_CLEANUP === 'true';
+  
+  if (!cleanupEnabled) {
+    console.log('🚫 Data cleanup is disabled by default. Set ENABLE_DATA_CLEANUP=true to enable.');
+    return;
+  }
+  
   const retentionHours = parseInt(process.env.DATA_RETENTION_HOURS || '48');
   
   // Run cleanup every 6 hours
