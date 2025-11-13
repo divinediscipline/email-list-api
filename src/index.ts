@@ -40,11 +40,30 @@ if (process.env.NODE_ENV === 'production') {
   app.use(compression());
 }
 
+const getCorsOrigin = () => {
+  const { ALLOWED_ORIGINS, NODE_ENV } = process.env;
+
+  if (!ALLOWED_ORIGINS) {
+    return true;
+  }
+
+  const normalized = ALLOWED_ORIGINS.trim();
+
+  if (normalized === '*' || normalized.toLowerCase() === 'true') {
+    return true;
+  }
+
+  const origins = normalized
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
+  return origins.length > 0 ? origins : true;
+};
+
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? true // Allow all origins in production
-    : ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:5173', 'http://localhost:8080'],
+  origin: getCorsOrigin(),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
