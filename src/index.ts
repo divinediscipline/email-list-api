@@ -20,6 +20,9 @@ import cleanupOldData from './database/cleanup';
 // Load environment variables
 dotenv.config();
 
+// Detect if running in AWS Lambda
+const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
 const app = express();
 const PORT = process.env.PORT || 3001;
 
@@ -78,8 +81,10 @@ app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Static file serving for uploads
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Static file serving for uploads (only in non-Lambda environments)
+if (!isLambda) {
+  app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+}
 
 // Health check endpoint
 app.get('/health', async (req, res) => {
@@ -1041,7 +1046,7 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   });
 });
 
-// Schedule automatic data cleanup
+// Schedule automatic data cleanup (only in non-Lambda environments)
 const scheduleCleanup = () => {
   // Check if cleanup is enabled via environment variable (disabled by default)
   const cleanupEnabled = process.env.ENABLE_DATA_CLEANUP === 'true';
@@ -1067,7 +1072,7 @@ const scheduleCleanup = () => {
   console.log(`⏰ Scheduled automatic cleanup every 6 hours (retention: ${retentionHours} hours)`);
 };
 
-// Graceful shutdown
+// Graceful shutdown (only in non-Lambda environments)
 const gracefulShutdown = (signal: string) => {
   console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
   
@@ -1078,27 +1083,32 @@ const gracefulShutdown = (signal: string) => {
   process.exit(0);
 };
 
-// Handle shutdown signals
-process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
-process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+// Start server only if not running in Lambda
+if (!isLambda) {
+  // Handle shutdown signals
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 
-// Start server
-const server = app.listen(PORT, () => {
-  console.log(`🚀 Email API server running on port ${PORT}`);
-  console.log(`📚 API documentation available at http://localhost:${PORT}/api`);
-  console.log(`💚 Health check available at http://localhost:${PORT}/health`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🗄️  Database: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`);
-  console.log(`⏰ Data retention: ${process.env.DATA_RETENTION_HOURS || '48'} hours`);
-  
-  // Schedule cleanup after server starts
-  scheduleCleanup();
-});
+  // Start server
+  const server = app.listen(PORT, () => {
+    console.log(`🚀 Email API server running on port ${PORT}`);
+    console.log(`📚 API documentation available at http://localhost:${PORT}/api`);
+    console.log(`💚 Health check available at http://localhost:${PORT}/health`);
+    console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`🗄️  Database: ${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || '5432'}`);
+    console.log(`⏰ Data retention: ${process.env.DATA_RETENTION_HOURS || '48'} hours`);
+    
+    // Schedule cleanup after server starts
+    scheduleCleanup();
+  });
 
-// Handle server errors
-server.on('error', (error) => {
-  console.error('❌ Server error:', error);
-  process.exit(1);
-});
+  // Handle server errors
+  server.on('error', (error) => {
+    console.error('❌ Server error:', error);
+    process.exit(1);
+  });
+} else {
+  console.log('🔷 Running in AWS Lambda environment');
+}
 
 export default app; 

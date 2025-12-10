@@ -37,7 +37,6 @@ In your Render dashboard, add these environment variables:
 ```bash
 NODE_ENV=production
 JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-DATA_RETENTION_HOURS=48
 ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
@@ -95,9 +94,8 @@ DB_PASSWORD=your_db_password
 | `DB_USER` | Database user | Yes | - |
 | `DB_PASSWORD` | Database password | Yes | - |
 | `DATA_RETENTION_HOURS` | Data retention period | No | `48` |
-| `RATE_LIMIT_MAX_REQUESTS` | Rate limit requests | No | `100` |
-| `RATE_LIMIT_WINDOW_MS` | Rate limit window | No | `900000` |
 | `ALLOWED_ORIGINS` | CORS allowed origins | No | `https://yourdomain.com` |
+| `ENABLE_DATA_CLEANUP` | Enable automatic cleanup | No | `false` |
 
 ## Troubleshooting
 

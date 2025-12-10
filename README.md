@@ -12,7 +12,7 @@ A production-ready REST API for email client applications with PostgreSQL databa
 - 🗄️ **PostgreSQL Database** - Persistent data storage with proper indexing
 - 🧹 **Automatic Cleanup** - Configurable data retention (default: 48 hours)
 - 🚀 **Production Ready** - Optimized for Render hosting with health checks
-- 🔒 **Security** - Rate limiting, CORS, Helmet, input validation
+- 🔒 **Security** - CORS, Helmet, input validation
 - 📊 **Monitoring** - Health checks, logging, error handling
 
 ## Tech Stack
@@ -22,7 +22,7 @@ A production-ready REST API for email client applications with PostgreSQL databa
 - **Database**: PostgreSQL 15+
 - **Authentication**: JWT
 - **Validation**: express-validator
-- **Security**: Helmet, CORS, Rate Limiting
+- **Security**: Helmet, CORS
 - **Scheduling**: node-cron
 - **Hosting**: Render
 
@@ -135,7 +135,6 @@ In your Render dashboard, add these environment variables:
 NODE_ENV=production
 JWT_SECRET=your-super-secret-jwt-key-change-this
 DATA_RETENTION_HOURS=48
-RATE_LIMIT_MAX_REQUESTS=100
 ALLOWED_ORIGINS=https://yourdomain.com
 ```
 
@@ -288,7 +287,6 @@ npm run db:cleanup
 
 - **JWT Authentication** - Secure token-based authentication
 - **Password Hashing** - bcrypt with salt rounds
-- **Rate Limiting** - Prevent abuse and DDoS
 - **CORS Protection** - Configured for production domains
 - **Helmet Security** - Security headers and CSP
 - **Input Validation** - Request validation and sanitization
