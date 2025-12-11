@@ -71,7 +71,7 @@ deploy_test:
     - cd dist && sls deploy --stage dev --region $AWS_DEFAULT_REGION
   only:
     #- /^[A-Z]+-\d+-.*$/
-    - master
+    - main
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[skip[ _-](deploy|test)?\]/i

@@ -1,0 +1,167 @@
+service: email-list-api
+frameworkVersion: '3'
+configValidationMode: off
+useDotenv: false
+custom:
+  id: ${aws:accountId, 582447311186}
+  bucket: ${self:custom.alias.${self:custom.id}}-${self:service}-${opt:stage}
+  alias:
+    "582447311186": squadinc.co
+    "018901164770": squadco.com
+  vpc:
+    "582447311186":
+      securityGroupIds:
+        - sg-650ad11e #Private
+      subnetIds:
+        - subnet-2f1b7055
+        - subnet-e2321d8b
+        - subnet-58269814
+    "018901164770":
+      securityGroupIds:
+        - sg-0f7e009023526cd5b #Private
+      subnetIds:
+        - subnet-0af10975ffc152f3a
+        - subnet-03f0133d75bc4b3e3
+        - subnet-06a7dfab8834e4533
+provider:
+  name: aws
+  runtime: nodejs18.x
+  memorySize: 256
+  timeout: 300
+  tags:
+    service: email-list
+    company: Squad
+    project: case-challenge
+  apiGateway:
+    restApiId:
+      "Fn::ImportValue": ${opt:stage, self:provider.stage}-RestApiId
+    restApiRootResourceId:
+      "Fn::ImportValue": ${opt:stage, self:provider.stage}-RootResourceId
+    #binaryMediaTypes:
+      #- 'application/pdf'
+  tracing:
+    lambda: true
+  deploymentBucket:
+    name: ${self:custom.id}.${opt:region, 'eu-west-2'}.deploys
+  iam:
+    role: arn:aws:iam::${self:custom.id}:role/CustomRoleForLambda
+  vpc: ${self:custom.vpc.${self:custom.id}}
+  environment:
+    S3_BUCKET:
+      Ref: S3BucketAssets
+    S3_DISTRIBUTION:
+      "Fn::GetAtt":
+        - AssetsDistribution
+        - DomainName
+
+    NODE_OPTIONS: '--enable-source-maps'
+
+plugins:
+  # - serverless-plugin-typescript
+  # - serverless-offline
+
+package:
+  include:
+    - ".sequelizerc"
+    - ".env"
+  exclude:
+    - "node_modules/aws-sdk/**"
+    - "node_modules/typescript/**"
+    - "**/*.map"
+
+functions:
+  app:
+    handler: dist/lambda.handler
+    timeout: 300
+    memorySize: 512
+    dependsOn:
+      - S3BucketAssets
+    events:
+      - s3:
+          bucket: ${self:custom.bucket}
+          existing: true
+          event: s3:ObjectCreated:*
+      - s3:
+          bucket: ${self:custom.bucket}
+          existing: true
+          event: s3:ObjectRemoved:*
+      - http:
+          path: /email-list/v1
+          method: ANY
+          cors: false
+      - http:
+          path: /email-list/v1/{proxy+}
+          method: ANY
+          cors: false
+
+  #job:
+   # handler: src/aws/lambda-handler.handler
+    #timeout: 300 # 5 minutes
+    #reservedConcurrency: 5 #limiting the number of concurrent invocations
+    #events:
+      #- schedule:
+          #rate: cron(0/1 * * * ? *) #Retry failed payout every 10min
+          #input:
+           # fn: cmd:retry_failed_payout
+            
+resources:
+  Resources:
+    AppLogGroup:
+      Type: AWS::Logs::LogGroup
+      Properties:
+        RetentionInDays: "90"
+    S3BucketAssets:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:custom.bucket}
+        VersioningConfiguration:
+          Status: Enabled
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - "*"
+              AllowedMethods:
+                - GET
+                - PUT
+                - POST
+                - DELETE
+                - HEAD
+              AllowedOrigins:
+                - "*"
+    AssetsDistribution:
+      Type: AWS::CloudFront::Distribution
+      DependsOn:
+        - S3BucketAssets
+      Properties:
+        DistributionConfig:
+          Origins:
+            - DomainName:
+                "Fn::GetAtt":
+                  - S3BucketAssets
+                  - RegionalDomainName
+              Id:
+                Ref: S3BucketAssets
+              CustomOriginConfig:
+                OriginProtocolPolicy: http-only
+          Enabled: "true"
+          Comment: ${self:service} ${opt:stage}
+          DefaultCacheBehavior:
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            CachedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+            Compress: true
+            TargetOriginId:
+              Ref: S3BucketAssets
+            ForwardedValues:
+              QueryString: "false"
+              Cookies:
+                Forward: none
+            ViewerProtocolPolicy: redirect-to-https
+          PriceClass: PriceClass_All
+          ViewerCertificate:
+            CloudFrontDefaultCertificate: "true"
