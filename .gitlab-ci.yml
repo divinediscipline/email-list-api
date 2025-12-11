@@ -1,0 +1,108 @@
+image: avonnadozie/serverless:3.35.0
+cache:
+  key:
+    files:
+      - package-lock.json
+  paths:
+    - node_modules/
+stages:
+  - test
+  - staging
+  - live
+build_test:
+  stage: test
+  services:
+    - name: postgres:15.2
+      alias: "postgres"
+    - name: redis:8.0.2-alpine
+      alias: "redis"
+
+  variables:
+    # Configure environment
+    NAME: "email_list"
+    ID: "email_list"
+    NODE_ENV: "test"
+    NODE_PATH: src
+    PORT: "8004"
+    #REDIS_URL: "18.168.104.169"
+    REDIS_URL: redis
+    REDIS_PORT: 6379
+
+    POSTGRES_USER: "root"
+    POSTGRES_PASSWORD: "secret"
+    POSTGRES_DB: "test-db"
+    POSTGRES_DB_HOST: "postgres"
+
+    DB_USERNAME: "root"
+    DB_PASSWORD: "secret"
+    DB_NAME: "test-db"
+    DB_HOST: "postgres"
+
+  script:
+    #- cp "$GITLAB_NPMRC" "$(pwd)/.npmrc"
+    - npm install
+    #- npm run lint
+    - npm run build
+    #- npm test
+  artifacts:
+    paths:
+      - node_modules/
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-]test?\]/i
+deploy_test:
+  stage: staging
+  script:
+    # Remove dev files from npm
+    - npm install --omit=dev
+    - npm install --save-dev typescript
+
+    # Create .env from $TEST_ENV_FILE gitlab file
+    - cp "$G_TEST_ENV_FILE" "$(pwd)/.env" || echo "G_TEST_ENV_FILE does not exist"
+    - if [[ $TEST_ENV_FILE ]]; then cat "$TEST_ENV_FILE" >> "$(pwd)/.env"; else echo "No specific ENV configured for demo"; fi
+    #Build ts to ./dist folder
+    - npm run build
+    - sh "./scripts/copy.sh"
+    - sh "./scripts/clean.sh"
+    # Run migration BEFORE deploying Lambda
+    - echo "Running database migrations..."
+    - npm run db:migrate
+    # Deploy
+    - cd dist && sls deploy --stage dev --region $AWS_DEFAULT_REGION
+  only:
+    #- /^[A-Z]+-\d+-.*$/
+    - master
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-](deploy|test)?\]/i
+  #tags:
+   # - habari
+  #environment:
+  #name: testing
+  #url: https://test-gtfm-api.squadinc.co
+
+deploy_live:
+  stage: live
+  script:
+    # Remove dev files from npm
+    - npm install
+    # Create .env from $LIVE_ENV_FILE gitlab file
+    - export AWS_ACCESS_KEY_ID=$LIVE_AWS_ACCESS_KEY_ID && export AWS_SECRET_ACCESS_KEY=$LIVE_AWS_SECRET_ACCESS_KEY
+    - export AWS_CLIENT_TIMEOUT=900000
+    - cp "$G_LIVE_ENV_FILE" "$(pwd)/.env"
+    - if [[ $LIVE_ENV_FILE ]]; then cat "$LIVE_ENV_FILE" >> "$(pwd)/.env"; else echo "No specific ENV configured for live"; fi
+    #Build ts to ./dist folder
+    - npm run build
+    # Run migration BEFORE deploying Lambda
+    - echo "Running database migrations..."
+    - npm run db:migrate
+    - npm install --omit=dev
+    # Deploy
+    - cd dist && sls deploy --stage prod --region $AWS_DEFAULT_REGION
+  only:
+    - live
+  except:
+    variables:
+      - $CI_COMMIT_MESSAGE =~ /\[skip[ _-](live|deploy|test)?\]/i
+  environment:
+    name: production
