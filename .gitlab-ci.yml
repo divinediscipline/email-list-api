@@ -64,9 +64,15 @@ deploy_test:
     - npm run build
     - sh "./scripts/copy.sh"
     - sh "./scripts/clean.sh"
-    # Run migration BEFORE deploying Lambda (only if database is accessible)
-    - echo "Running database migrations..."
-    - npm run db:migrate || echo "⚠️  Migration skipped - database not accessible from CI/CD runner"
+    # Run migration BEFORE deploying Lambda (only if DB credentials are available)
+    - |
+      if [ -f .env ] && grep -q "DB_HOST" .env 2>/dev/null; then
+        echo "✅ Database credentials found - running migrations..."
+        npm run db:migrate || echo "⚠️  Migration failed but continuing deployment"
+      else
+        echo "⏭️  Skipping migrations - no database credentials in CI/CD environment"
+        echo "   Migrations should be run manually or via Lambda after deployment"
+      fi
     # Deploy
     - cd dist && sls deploy --stage dev --region $AWS_DEFAULT_REGION
   only:
@@ -94,9 +100,15 @@ deploy_live:
     - if [[ $LIVE_ENV_FILE ]]; then cat "$LIVE_ENV_FILE" >> "$(pwd)/.env"; else echo "No specific ENV configured for live"; fi
     #Build ts to ./dist folder
     - npm run build
-    # Run migration BEFORE deploying Lambda (only if database is accessible)
-    - echo "Running database migrations..."
-    - npm run db:migrate || echo "⚠️  Migration skipped - database not accessible from CI/CD runner"
+    # Run migration BEFORE deploying Lambda (only if DB credentials are available)
+    - |
+      if [ -f .env ] && grep -q "DB_HOST" .env 2>/dev/null; then
+        echo "✅ Database credentials found - running migrations..."
+        npm run db:migrate || echo "⚠️  Migration failed but continuing deployment"
+      else
+        echo "⏭️  Skipping migrations - no database credentials in CI/CD environment"
+        echo "   Migrations should be run manually or via Lambda after deployment"
+      fi
     - npm install --omit=dev
     # Deploy
     - cd dist && sls deploy --stage prod --region $AWS_DEFAULT_REGION
