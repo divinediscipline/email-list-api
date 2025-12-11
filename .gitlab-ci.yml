@@ -64,24 +64,25 @@ deploy_test:
     - npm run build
     - sh "./scripts/copy.sh"
     - sh "./scripts/clean.sh"
-    # Run migration BEFORE deploying Lambda (only if DB credentials are available)
-    - |
-      if [ -f .env ] && grep -q "DB_HOST" .env 2>/dev/null; then
-        echo "✅ Database credentials found - running migrations..."
-        npm run db:migrate || echo "⚠️  Migration failed but continuing deployment"
-      else
-        echo "⏭️  Skipping migrations - no database credentials in CI/CD environment"
-        echo "   Migrations should be run manually or via Lambda after deployment"
-      fi
-    # Deploy
+    # Deploy Lambda first
     - cd dist && sls deploy --stage dev --region $AWS_DEFAULT_REGION
+    # Run migrations via Lambda (has VPC access to database)
+    - echo "🚀 Running database migrations via Lambda..."
+    - sls invoke --function migrate --stage dev --region $AWS_DEFAULT_REGION --log
+    - |
+      if [ $? -eq 0 ]; then
+        echo "✅ Database migrations completed successfully"
+      else
+        echo "❌ Database migrations failed - check logs above"
+        echo "   You can retry manually: sls invoke --function migrate --stage dev"
+        exit 1
+      fi
   only:
     #- /^[A-Z]+-\d+-.*$/
     - main
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[skip[ _-](deploy|test)?\]/i
-  when: manual  # Make deployment manual to prevent automatic runs
   #tags:
    # - habari
   #environment:
@@ -100,23 +101,24 @@ deploy_live:
     - if [[ $LIVE_ENV_FILE ]]; then cat "$LIVE_ENV_FILE" >> "$(pwd)/.env"; else echo "No specific ENV configured for live"; fi
     #Build ts to ./dist folder
     - npm run build
-    # Run migration BEFORE deploying Lambda (only if DB credentials are available)
-    - |
-      if [ -f .env ] && grep -q "DB_HOST" .env 2>/dev/null; then
-        echo "✅ Database credentials found - running migrations..."
-        npm run db:migrate || echo "⚠️  Migration failed but continuing deployment"
-      else
-        echo "⏭️  Skipping migrations - no database credentials in CI/CD environment"
-        echo "   Migrations should be run manually or via Lambda after deployment"
-      fi
     - npm install --omit=dev
-    # Deploy
+    # Deploy Lambda first
     - cd dist && sls deploy --stage prod --region $AWS_DEFAULT_REGION
+    # Run migrations via Lambda (has VPC access to database)
+    - echo "🚀 Running database migrations via Lambda..."
+    - sls invoke --function migrate --stage prod --region $AWS_DEFAULT_REGION --log
+    - |
+      if [ $? -eq 0 ]; then
+        echo "✅ Database migrations completed successfully"
+      else
+        echo "❌ Database migrations failed - check logs above"
+        echo "   You can retry manually: sls invoke --function migrate --stage prod"
+        exit 1
+      fi
   only:
     - live
   except:
     variables:
       - $CI_COMMIT_MESSAGE =~ /\[skip[ _-](live|deploy|test)?\]/i
-  when: manual  # Make deployment manual to prevent automatic runs
   environment:
     name: production
