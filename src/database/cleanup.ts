@@ -62,21 +62,10 @@ const runCleanup = async () => {
   try {
     await cleanupOldData();
     console.log('✅ Data cleanup completed successfully');
-    
-    // Only exit if running as a script (not in Lambda)
-    if (require.main === module) {
-      process.exit(0);
-    }
+    process.exit(0);
   } catch (error) {
     console.error('❌ Cleanup failed:', error);
-    
-    // Only exit if running as a script (not in Lambda)
-    if (require.main === module) {
-      process.exit(1);
-    }
-    
-    // Re-throw error for Lambda to handle
-    throw error;
+    process.exit(1);
   }
 };
 

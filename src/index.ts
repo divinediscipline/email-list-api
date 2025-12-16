@@ -26,6 +26,9 @@ const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Base path for Lambda deployment (API Gateway uses /email-list/v1 prefix)
+const BASE_PATH = isLambda ? '/email-list/v1' : '';
+
 // Security middleware
 app.use(helmet({
   contentSecurityPolicy: {
@@ -87,7 +90,7 @@ if (!isLambda) {
 }
 
 // Health check endpoint
-app.get('/health', async (req, res) => {
+app.get(`${BASE_PATH}/health`, async (req, res) => {
   try {
     // Test database connection
     const client = await databaseService.pool.connect();
@@ -99,7 +102,8 @@ app.get('/health', async (req, res) => {
       timestamp: new Date().toISOString(),
       environment: process.env.NODE_ENV,
       database: 'connected',
-      version: '1.0.0'
+      version: '1.0.0',
+      basePath: BASE_PATH || '/'
     });
   } catch (error) {
     res.status(503).json({
@@ -114,13 +118,13 @@ app.get('/health', async (req, res) => {
 });
 
 // API routes
-app.use('/api/auth', authRoutes);
-app.use('/api/emails', emailRoutes);
-app.use('/api/navigation', navigationRoutes);
-app.use('/api/notifications', notificationRoutes);
+app.use(`${BASE_PATH}/api/auth`, authRoutes);
+app.use(`${BASE_PATH}/api/emails`, emailRoutes);
+app.use(`${BASE_PATH}/api/navigation`, navigationRoutes);
+app.use(`${BASE_PATH}/api/notifications`, notificationRoutes);
 
 // Root endpoint - Welcome message with available endpoints
-app.get('/', (req, res) => {
+app.get(`${BASE_PATH}/`, (req, res) => {
   res.json({
     success: true,
     message: 'Welcome to Email Client API',
@@ -145,7 +149,7 @@ app.get('/', (req, res) => {
 });
 
 // API documentation endpoint
-app.get('/api', (req, res) => {
+app.get(`${BASE_PATH}/api`, (req, res) => {
   res.json({
     success: true,
     message: 'Email Client API',
