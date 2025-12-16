@@ -94,6 +94,13 @@ functions:
           method: ANY
           cors: false
 
+  # Migration function - runs database migrations
+  migrate:
+    handler: dist/migrate-lambda.handler
+    timeout: 300
+    memorySize: 512
+    description: Database migration function (invoke manually or via CI/CD)
+
   #job:
    # handler: src/aws/lambda-handler.handler
     #timeout: 300 # 5 minutes

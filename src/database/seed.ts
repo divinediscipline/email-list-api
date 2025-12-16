@@ -399,10 +399,21 @@ const runSeed = async () => {
   try {
     await seedDatabase();
     console.log('✅ Database seeding completed successfully');
-    process.exit(0);
+    
+    // Only exit if running as a script (not in Lambda)
+    if (require.main === module) {
+      process.exit(0);
+    }
   } catch (error) {
     console.error('❌ Seeding failed:', error);
-    process.exit(1);
+    
+    // Only exit if running as a script (not in Lambda)
+    if (require.main === module) {
+      process.exit(1);
+    }
+    
+    // Re-throw error for Lambda to handle
+    throw error;
   }
 };
 
