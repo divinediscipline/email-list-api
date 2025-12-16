@@ -125,6 +125,10 @@ app.use(`${BASE_PATH}/api/notifications`, notificationRoutes);
 
 // Root endpoint - Welcome message with available endpoints
 app.get(`${BASE_PATH}/`, (req, res) => {
+  // Get the correct protocol (handle proxy/API Gateway scenarios)
+  const protocol = req.get('x-forwarded-proto') || req.protocol;
+  const host = req.get('host');
+  
   res.json({
     success: true,
     message: 'Welcome to Email Client API',
@@ -133,12 +137,12 @@ app.get(`${BASE_PATH}/`, (req, res) => {
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     endpoints: {
-      health: `${req.protocol}://${req.get('host')}/health`,
-      documentation: `${req.protocol}://${req.get('host')}/api`,
-      authentication: `${req.protocol}://${req.get('host')}/api/auth`,
-      emails: `${req.protocol}://${req.get('host')}/api/emails`,
-      navigation: `${req.protocol}://${req.get('host')}/api/navigation`,
-      notifications: `${req.protocol}://${req.get('host')}/api/notifications`
+      health: `${protocol}://${host}${BASE_PATH}/health`,
+      documentation: `${protocol}://${host}${BASE_PATH}/api`,
+      authentication: `${protocol}://${host}${BASE_PATH}/api/auth`,
+      emails: `${protocol}://${host}${BASE_PATH}/api/emails`,
+      navigation: `${protocol}://${host}${BASE_PATH}/api/navigation`,
+      notifications: `${protocol}://${host}${BASE_PATH}/api/notifications`
     },
     sampleCredentials: {
       email: 'sarah.johnson@techcorp.com',
@@ -150,11 +154,15 @@ app.get(`${BASE_PATH}/`, (req, res) => {
 
 // API documentation endpoint
 app.get(`${BASE_PATH}/api`, (req, res) => {
+  // Get the correct protocol (handle proxy/API Gateway scenarios)
+  const protocol = req.get('x-forwarded-proto') || req.protocol;
+  const host = req.get('host');
+  
   res.json({
     success: true,
     message: 'Email Client API',
     version: '1.0.0',
-    baseUrl: `${req.protocol}://${req.get('host')}`,
+    baseUrl: `${protocol}://${host}${BASE_PATH}`,
     authentication: {
       type: 'Bearer Token',
       header: 'Authorization: Bearer <token>',
