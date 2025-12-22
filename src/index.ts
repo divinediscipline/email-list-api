@@ -41,8 +41,9 @@ app.use(helmet({
   },
 }));
 
-// Compression middleware for production
-if (process.env.NODE_ENV === 'production') {
+// Compression middleware for production (disabled in Lambda - API Gateway handles compression)
+// Compression in Lambda can cause issues with aws-serverless-express and browser clients
+if (process.env.NODE_ENV === 'production' && !isLambda) {
   app.use(compression());
 }
 
@@ -136,13 +137,20 @@ app.get(`${BASE_PATH}/`, (req, res) => {
     status: 'running',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
-    endpoints: {
-      health: `${protocol}://${host}${BASE_PATH}/health`,
-      documentation: `${protocol}://${host}${BASE_PATH}/api`,
-      authentication: `${protocol}://${host}${BASE_PATH}/api/auth`,
-      emails: `${protocol}://${host}${BASE_PATH}/api/emails`,
-      navigation: `${protocol}://${host}${BASE_PATH}/api/navigation`,
-      notifications: `${protocol}://${host}${BASE_PATH}/api/notifications`
+    documentation: `${protocol}://${host}${BASE_PATH}/api`,
+    quickStart: {
+      step1: 'View full API documentation',
+      step1Url: `${protocol}://${host}${BASE_PATH}/api`,
+      step2: 'Check API health',
+      step2Url: `${protocol}://${host}${BASE_PATH}/health`,
+      step3: 'Login with sample credentials below to get started'
+    },
+    apiRoutes: {
+      note: 'These are route prefixes. See /api documentation for specific endpoints.',
+      authentication: `${protocol}://${host}${BASE_PATH}/api/auth/login, /api/auth/register, etc.`,
+      emails: `${protocol}://${host}${BASE_PATH}/api/emails, /api/emails/:id, etc.`,
+      navigation: `${protocol}://${host}${BASE_PATH}/api/navigation/items, etc.`,
+      notifications: `${protocol}://${host}${BASE_PATH}/api/notifications/notifications, etc.`
     },
     sampleCredentials: {
       email: 'sarah.johnson@techcorp.com',
@@ -160,13 +168,20 @@ app.get(`${BASE_PATH}/api`, (req, res) => {
   
   res.json({
     success: true,
-    message: 'Email Client API',
+    message: 'Email Client API - Full Documentation',
     version: '1.0.0',
     baseUrl: `${protocol}://${host}${BASE_PATH}`,
+    quickStart: {
+      step1: 'Register a new user or login with existing credentials',
+      step2: 'Copy the JWT token from the login response',
+      step3: 'Use the token in Authorization header: Bearer <token>',
+      step4: 'Access protected endpoints using the examples below'
+    },
     authentication: {
       type: 'Bearer Token',
       header: 'Authorization: Bearer <token>',
-      note: 'Required for all protected endpoints'
+      note: 'Required for all protected endpoints (except /api/auth/register and /api/auth/login)',
+      example: 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
     },
     pagination: {
       parameters: '?page=1&limit=15',
@@ -556,15 +571,16 @@ app.get(`${BASE_PATH}/api`, (req, res) => {
         addLabel: {
           method: 'PATCH',
           path: '/api/emails/:id/labels/add',
-          description: 'Add label to email',
+          description: 'Add label to email by label name (label will be created if it does not exist)',
           headers: {
             'Authorization': 'Bearer <token>',
             'Content-Type': 'application/json'
           },
           request: {
             body: {
-              labelId: 'label-123'
-            }
+              label: 'Work'
+            },
+            note: 'Use the label name (string), not the label ID. The label will be created automatically if it does not exist.'
           },
           response: {
             success: {
@@ -583,15 +599,16 @@ app.get(`${BASE_PATH}/api`, (req, res) => {
         removeLabel: {
           method: 'PATCH',
           path: '/api/emails/:id/labels/remove',
-          description: 'Remove label from email',
+          description: 'Remove label from email by label name',
           headers: {
             'Authorization': 'Bearer <token>',
             'Content-Type': 'application/json'
           },
           request: {
             body: {
-              labelId: 'label-123'
-            }
+              label: 'Work'
+            },
+            note: 'Use the label name (string), not the label ID.'
           },
           response: {
             success: {

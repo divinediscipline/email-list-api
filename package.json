@@ -8,6 +8,7 @@
     "start": "node dist/index.js",
     "dev": "nodemon src/index.ts",
     "test": "jest",
+    "test:compression": "npm run build && node test-compression-simple.js",
     "lint": "eslint src/**/*.ts",
     "lint:fix": "eslint src/**/*.ts --fix",
     "db:migrate": "node dist/database/migrate.js",
